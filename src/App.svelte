@@ -153,6 +153,7 @@
   select {
     width: 25%;
     max-width: 195px;
+    min-width: 95px;
   }
 
   .btns {
