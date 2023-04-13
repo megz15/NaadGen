@@ -2,14 +2,38 @@
   import * as Tone from 'tone';
   const synth = new Tone.PolySynth(Tone.Synth).toDestination();
   
-  const taal = {
-    'Jhaptaal': [2,5,7,10]
+  const taals = {
+    'Jhaptaal': [2,5,7,10],
+    'Deepchandi': [3,7,10,14]
   }
-  const notes = {'B3':'Sa','C#4':'Re','D#4':'Ga','E4':'Ma','F#4':'Pa','G#4':'Dha','A#4':'Ni'}
+
+  const notes = {
+    'Sa'  : ['B', -1],
+    'Re_K': ['C', 0],
+    'Re'  : ['C#', 0],
+    'Ga_K': ['D', 0],
+    'Ga'  : ['D#', 0],
+    'Ma'  : ['E', 0],
+    'Ma_T': ['F', 0],
+    'Pa'  : ['F#', 0],
+    'Dha_K': ['G', 0],
+    'Dha' : ['G#', 0],
+    'Ni_K': ['A', 0],
+    'Ni'  : ['A#', 0],
+  }
+  
+  const ragas = {
+    'Kafi': ['Sa','Re','Ga_K','Ma','Pa','Dha','Ni_K']
+  }
+
   let composition = []
 
-  function play(n, t, v) {
-    synth.triggerAttackRelease(n, '8n', t, v);
+  const taal = taals['Deepchandi']
+  const raga = ragas['Kafi'] //Object.assign({}, notes, ragas['Kafi'])
+
+  function play(n, o, t, v) {
+    if (n+o == '') synth.triggerAttackRelease(null, '8n', t, v);
+    else synth.triggerAttackRelease(n+o, '8n', t, v);
   }
 
   function addNote(n) {
@@ -19,13 +43,9 @@
 
   function playcomp() {
     composition.forEach((n,i) => {
-      play(n, Tone.now() + i/4, (taal['Jhaptaal'].includes(i%10) || i%10==0)?5:1)
+      const t = taal
+      play(n[0], n[1], Tone.now() + i/4, (t.includes(i%t.at(-1)) || i%t.at(-1)==0)?5:1)
     });
-
-    // new Tone.Sequence((_, n) => {
-    //   play(n, ());
-    // }, composition).start(0);
-    // Tone.Transport.start();
   }
 
 </script>
@@ -33,12 +53,16 @@
 <main>
   <h1>NaadGen</h1>
   
-  {#each Object.keys(notes) as n}
+  {#each raga as n}
     <button on:click={_ => {
-      play(n, Tone.now(), 1)
-      addNote(n)
-    }}>{notes[n]}</button>
+      play(notes[n][0], notes[n][1]+4, Tone.now(), 1)
+      addNote([notes[n][0], notes[n][1]+4])
+    }}>{n}</button>
   {/each}
+
+  <button on:click={_ => {
+    addNote(['',''])
+  }}>Rest</button>
 
   <button class="play" on:click={playcomp}>Play</button><br>
   
@@ -49,12 +73,12 @@
         {/each}
     </tr> -->
     {#each composition as n, i}
-      {#if (i%taal['Jhaptaal'].at(-1)==0)}
+      {#if (i%taal.at(-1)==0)}
         <tr></tr>
       {/if}
       <td>
         <!-- {#if ((i%5==0 || i%7==0) && i!=0 && i%10!=0)} -->
-        {#if (taal['Jhaptaal'].slice(0,-1).includes(i%10))}
+        {#if (taal.slice(0,-1).includes(i%taal.at(-1)))}
           <vibhaag /><note>{n}</note>
         {:else}
           <note>{n}</note>
@@ -76,11 +100,13 @@
   }
 
   table {
-    border: 1px solid red;
+    border: 1px solid black;
   }
 
   td {
     padding: 10px;
+    /* width: 50px;
+    display: inline-block; */
   }
 
   vibhaag {
