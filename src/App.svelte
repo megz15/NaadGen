@@ -1,12 +1,11 @@
 <script>
-  import * as Tone from 'tone';
-    import NoteInput from './lib/NoteInput.svelte';
-  const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+  import * as Tone from 'tone'
+  import NoteInput from './lib/NoteInput.svelte'
   
-  const taals = {
-    'Jhaptaal': [2,5,7,10],
-    'Deepchandi': [3,7,10,14]
-  }
+  import taals from './assets/taals.json'
+  import ragas from './assets/ragas.json'
+
+  const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 
   const notes = {
     'Sa'  : 'C',
@@ -23,41 +22,49 @@
     'Ni'  : 'B',
     '': ''
   }
-  
-  const ragas = {
-    'Kafi': ['Sa','Re','G_K','Ma','Pa','Dha','N_K']
-  }
 
-  const taal = taals['Deepchandi']
-  const raga = ragas['Kafi']
+  let taal = Object.keys(taals)[0]
+  let raga = Object.keys(ragas)[0]
 
-  let composition = [] //[...Array(taal.at(-1)).keys()]
+  let composition = []
 
   function play(n, o, t, v) {
     if (n == '') synth.triggerAttackRelease(null, '8n', t, v);
     else synth.triggerAttackRelease(n+o, '8n', Tone.now() + t, v);
   }
 
-  function addNote(n) {
-    composition = [...composition, n]
-  }
+  const addNote = (n) => composition = [...composition, n]
 
-  function playcomp() {
-    composition.forEach((n,i) => {
-      const t = taal
+  const playcomp = () => composition.forEach((n,i) => {
+      const t = taals[taal]
       play(n[0], n[1], i/4, (t.includes(i%t.at(-1)) || i%t.at(-1)==0)?5:1)
-    });
-  }
+  })
 
 </script>
 
 <main>
   <h1>NaadGen</h1>
   
+  <div style="margin:1em">
+    <select bind:value={taal} name="taals" style="width:140px">
+      <optgroup label="Select a Taal" />
+      {#each Object.keys(taals) as taal}
+        <option>{taal}</option>
+      {/each}
+    </select>
+
+    <select bind:value={raga} name="ragas" style="width:140px">
+      <optgroup label="Select a Raga" />
+      {#each Object.keys(ragas) as raga}
+        <option>{raga}</option>
+      {/each}
+    </select>
+  </div>
+
   <div class="ctrl">
     <div class="btns">
       {#each [3,4,5] as o}
-        <NoteInput raga={raga} notes={notes} octave={o} play={play} addNote={addNote}/>
+        <NoteInput raga={ragas[raga]} notes={notes} octave={o} play={play} addNote={addNote}/>
       {/each}
     </div>
 
@@ -68,27 +75,27 @@
 
       <button class="play" on:click={playcomp}>Play</button>
 
-      <button>Clear</button>
+      <button on:click={_ => composition = []}>Clear</button>
     </div>
   </div>
   
   <div class="wrap">
     <table>
-      {#each [...Array(taal.at(-1)).keys()] as i}
+      {#each [...Array(taals[taal].at(-1)).keys()] as i}
         <td>
-          {#if (taal.slice(0,-1).includes(i))}<vibhaag />{/if}
-          <note>{(i+1).toString().padEnd(3)}</note>
+          {#if (taals[taal].slice(0,-1).includes(i))}<vibhaag />{/if}
+          <note class='matra'>{(i+1).toString().padEnd(3)}</note>
         </td>
       {/each}
 
       {#each composition as n, i}
         
-        {#if (i%taal.at(-1)==0)}<tr />{/if}
+        {#if (i%taals[taal].at(-1)==0)}<tr />{/if}
 
         <td>
-          {#if (taal.slice(0,-1).includes(i%taal.at(-1)))}<vibhaag />{/if}
+          {#if (taals[taal].slice(0,-1).includes(i%taals[taal].at(-1)))}<vibhaag />{/if}
           
-          <note class="{n[1]==3?'mandra':n[1]==4?'madhya':'taar'}">{
+          <note class="{n[0]==''?'matra':n[1]==3?'mandra':n[1]==4?'madhya':'taar'}">{
             Object.keys(notes).find(key => notes[key] === n[0]).padEnd(3)
           }</note>
         </td>
@@ -96,6 +103,8 @@
       {/each}
     </table>
   </div>
+
+  <div class='footer'>insert footer text later lorem ipsum</div>
 
 </main>
 
@@ -148,13 +157,25 @@
     justify-content: center;
   }
 
+  @media (max-width: 645px) {
+    .ctrl {flex-direction: column}
+    .btns {flex-direction: row}
+  }
+
   .wrap {
     /* background-color: cyan; */
     /* width: 100em; */
     max-width: 100%;
+    min-height: 162px;
     overflow-x: scroll;
     display: inline-flex;
     justify-content: start;
     /* visibility: hidden; */
+  }
+
+  .matra {
+    background-color: aliceblue;
+    color: black;
+    font-weight: 900;
   }
 </style>
