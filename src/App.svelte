@@ -1,5 +1,6 @@
 <script>
   import * as Tone from 'tone';
+    import NoteInput from './lib/NoteInput.svelte';
   const synth = new Tone.PolySynth(Tone.Synth).toDestination();
   
   const taals = {
@@ -8,43 +9,43 @@
   }
 
   const notes = {
-    'Sa'  : ['B', -1],
-    'Re_K': ['C', 0],
-    'Re'  : ['C#', 0],
-    'Ga_K': ['D', 0],
-    'Ga'  : ['D#', 0],
-    'Ma'  : ['E', 0],
-    'Ma_T': ['F', 0],
-    'Pa'  : ['F#', 0],
-    'Dha_K': ['G', 0],
-    'Dha' : ['G#', 0],
-    'Ni_K': ['A', 0],
-    'Ni'  : ['A#', 0],
+    'Sa'  : 'C',
+    'R_K'  : 'C#',
+    'Re'  : 'D',
+    'G_K'  : 'D#',
+    'Ga'  : 'E',
+    'Ma'  : 'F',
+    'M_T': 'F#',
+    'Pa'  : 'G',
+    'D_K' : 'G#',
+    'Dha' : 'A',
+    'N_K'  : 'A#',
+    'Ni'  : 'B',
+    '': ''
   }
   
   const ragas = {
-    'Kafi': ['Sa','Re','Ga_K','Ma','Pa','Dha','Ni_K']
+    'Kafi': ['Sa','Re','G_K','Ma','Pa','Dha','N_K']
   }
 
-  let composition = []
-
   const taal = taals['Deepchandi']
-  const raga = ragas['Kafi'] //Object.assign({}, notes, ragas['Kafi'])
+  const raga = ragas['Kafi']
+
+  let composition = [] //[...Array(taal.at(-1)).keys()]
 
   function play(n, o, t, v) {
-    if (n+o == '') synth.triggerAttackRelease(null, '8n', t, v);
-    else synth.triggerAttackRelease(n+o, '8n', t, v);
+    if (n == '') synth.triggerAttackRelease(null, '8n', t, v);
+    else synth.triggerAttackRelease(n+o, '8n', Tone.now() + t, v);
   }
 
   function addNote(n) {
-    // if (composition.length % 5 == 0) composition = [...composition, '|', n]
     composition = [...composition, n]
   }
 
   function playcomp() {
     composition.forEach((n,i) => {
       const t = taal
-      play(n[0], n[1], Tone.now() + i/4, (t.includes(i%t.at(-1)) || i%t.at(-1)==0)?5:1)
+      play(n[0], n[1], i/4, (t.includes(i%t.at(-1)) || i%t.at(-1)==0)?5:1)
     });
   }
 
@@ -53,46 +54,55 @@
 <main>
   <h1>NaadGen</h1>
   
-  {#each raga as n}
-    <button on:click={_ => {
-      play(notes[n][0], notes[n][1]+4, Tone.now(), 1)
-      addNote([notes[n][0], notes[n][1]+4])
-    }}>{n}</button>
-  {/each}
+  <div class="ctrl">
+    <div class="btns">
+      {#each [3,4,5] as o}
+        <NoteInput raga={raga} notes={notes} octave={o} play={play} addNote={addNote}/>
+      {/each}
+    </div>
 
-  <button on:click={_ => {
-    addNote(['',''])
-  }}>Rest</button>
+    <div class="btns">
+      <button on:click={_ => {
+        addNote(['', 0])
+      }}>Rest</button>
 
-  <button class="play" on:click={playcomp}>Play</button><br>
+      <button class="play" on:click={playcomp}>Play</button>
+
+      <button>Clear</button>
+    </div>
+  </div>
   
-  <table>
-    <!-- <tr>
-        {#each [1,2,3,4,5,6,7,8] as n}
-          <th><note>{n}</note></th>
-        {/each}
-    </tr> -->
-    {#each composition as n, i}
-      {#if (i%taal.at(-1)==0)}
-        <tr></tr>
-      {/if}
-      <td>
-        <!-- {#if ((i%5==0 || i%7==0) && i!=0 && i%10!=0)} -->
-        {#if (taal.slice(0,-1).includes(i%taal.at(-1)))}
-          <vibhaag /><note>{n}</note>
-        {:else}
-          <note>{n}</note>
-        {/if}
-      </td>
-      <!-- <td><note>{n}</note></td> -->
-    {/each}
-  </table>
+  <div class="wrap">
+    <table>
+      {#each [...Array(taal.at(-1)).keys()] as i}
+        <td>
+          {#if (taal.slice(0,-1).includes(i))}<vibhaag />{/if}
+          <note>{(i+1).toString().padEnd(3)}</note>
+        </td>
+      {/each}
+
+      {#each composition as n, i}
+        
+        {#if (i%taal.at(-1)==0)}<tr />{/if}
+
+        <td>
+          {#if (taal.slice(0,-1).includes(i%taal.at(-1)))}<vibhaag />{/if}
+          
+          <note class="{n[1]==3?'mandra':n[1]==4?'madhya':'taar'}">{
+            Object.keys(notes).find(key => notes[key] === n[0]).padEnd(3)
+          }</note>
+        </td>
+        
+      {/each}
+    </table>
+  </div>
 
 </main>
 
 <style>
   note {
-    background-color: #000000;
+    font-family: monospace;
+    white-space: pre;
   }
 
   .play {
@@ -100,6 +110,7 @@
   }
 
   table {
+    margin: 2em;
     border: 1px solid black;
   }
 
@@ -119,5 +130,31 @@
     font-family: inherit;
     background-color: #000000;
     transition: border-color 0.25s;
+  }
+
+  .btns {
+    display: flex;
+    flex-direction: column;
+    justify-content:space-between;
+    /* align-items: center; */
+    /* justify-content: center; */
+  }
+
+  .ctrl {
+    display: flex;
+    gap: 2em;
+    /* flex-direction: row; */
+    /* align-items: center; */
+    justify-content: center;
+  }
+
+  .wrap {
+    /* background-color: cyan; */
+    /* width: 100em; */
+    max-width: 100%;
+    overflow-x: scroll;
+    display: inline-flex;
+    justify-content: start;
+    /* visibility: hidden; */
   }
 </style>
