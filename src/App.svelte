@@ -4,6 +4,7 @@
   
   import taals from './assets/taals.json'
   import ragas from './assets/ragas.json'
+  import logo from '../public/logo.png'
 
   const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 
@@ -43,6 +44,8 @@
 </script>
 
 <main>
+  <img src="{logo}" class="logo" alt="NaadGen Logo" />
+
   <h1>NaadGen</h1>
   
   <div style="margin:1em">

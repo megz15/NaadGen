@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@500;600;800&display=swap');
+@import url('../public/font.css');
 
 :root {
   font-family: Raleway, Helvetica, Arial, sans-serif;
@@ -18,9 +18,9 @@
 }
 
 .logo {
-  height: 6.2em;
-  padding: 1em;
-  filter: drop-shadow(0 0 2em #646cffaa);
+  height: 8em;
+  margin:0;
+  filter: drop-shadow(0 0 2em #A71B28);
 }
 
 .footer {
@@ -58,7 +58,7 @@ h1 {
   font-weight: 800;
   font-size: 3.2em;
   line-height: 1;
-  margin-bottom: 0px;
+  margin: 0 0 2rem 0;
 }
 
 .card {
