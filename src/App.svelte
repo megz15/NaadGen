@@ -49,19 +49,21 @@
   <h1>NaadGen</h1>
   
   <div style="margin:1em">
-    <select bind:value={taal} name="taals" style="width:140px">
+    <select bind:value={taal} name="taals">
       <optgroup label="Select a Taal" />
       {#each Object.keys(taals) as taal}
         <option>{taal}</option>
       {/each}
     </select>
 
-    <select bind:value={raga} name="ragas" style="width:140px">
+    <select bind:value={raga} name="ragas">
       <optgroup label="Select a Raga" />
       {#each Object.keys(ragas) as raga}
         <option>{raga}</option>
       {/each}
     </select>
+
+    <button class="play" on:click={playcomp}>Play</button>
   </div>
 
   <div class="ctrl">
@@ -76,9 +78,8 @@
         addNote(['', 0])
       }}>Rest</button>
 
-      <button class="play" on:click={playcomp}>Play</button>
-
-      <button on:click={_ => composition = []}>Clear</button>
+      <button class="warn" on:click={_ => composition = composition.slice(0,-1)}>Delete</button>
+      <button class="warn" on:click={_ => composition = []}>Clear</button>
     </div>
   </div>
   
@@ -119,6 +120,11 @@
 
   .play {
     background-color: green;
+    margin-left: 10px;
+  }
+
+  .warn {
+    background-color: #A71B28;
   }
 
   table {
@@ -142,6 +148,11 @@
     font-family: inherit;
     background-color: #000000;
     transition: border-color 0.25s;
+  }
+
+  select {
+    width: 25%;
+    max-width: 195px;
   }
 
   .btns {
