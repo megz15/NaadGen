@@ -33,7 +33,19 @@
   width: 100%;
   padding: 1em 0 1em 0;
   margin: 0 auto;
-  backdrop-filter: blur(5px) brightness(0.2);
+  backdrop-filter: blur(4px) brightness(0.4);
+}
+
+a {
+  font-weight: 600;
+  transition: color 0.25s;
+  color: #F4900C;
+  text-decoration: inherit;
+  padding-left: 4px;
+}
+
+a:hover {
+  color: greenyellow;
 }
 
 body {
@@ -49,7 +61,7 @@ h1 {
   font-weight: 800;
   font-size: 3.2em;
   line-height: 1;
-  margin: 0 0 2rem 0;
+  margin: 0;
 }
 
 #app {
@@ -72,7 +84,7 @@ note, button, select {
   margin: 1px;
 }
 button:hover {
-  border-color: orange;
+  border-color: #F4900C;
 }
 button:focus,
 button:focus-visible {

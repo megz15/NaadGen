@@ -4,7 +4,7 @@
   
   import taals from './assets/taals.json'
   import ragas from './assets/ragas.json'
-  import logo from '../public/logo.png'
+  import logo from './assets/logo.png'
 
   const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 
@@ -47,6 +47,8 @@
   <img src="{logo}" class="logo" alt="NaadGen Logo" />
 
   <h1>NaadGen</h1>
+
+  <button class="ws-btn" on:click={_=>window.open('https://megz15.github.io/classical-music-workshop/')}>Access the Workshop Slides</button>
   
   <div style="margin:1em">
     <select bind:value={taal} name="taals">
@@ -88,7 +90,7 @@
       {#each [...Array(taals[taal].at(-1)).keys()] as i}
         <td>
           {#if (taals[taal].slice(0,-1).includes(i))}<vibhaag />{/if}
-          <note class='matra'>{(i+1).toString().padEnd(3)}</note>
+          <note class='matra' style='font-weight: 900'>{(i+1).toString().padEnd(3)}</note>
         </td>
       {/each}
 
@@ -108,7 +110,7 @@
     </table>
   </div>
 
-  <div class='footer'>insert footer text later lorem ipsum</div>
+  <div class='footer'>Created with 🧡 by <a href='https://github.com/megz15'>Meghraj Goswami</a></div>
 
 </main>
 
@@ -185,12 +187,14 @@
     overflow-x: scroll;
     display: inline-flex;
     justify-content: start;
+    margin-bottom: 3em;
     /* visibility: hidden; */
   }
 
-  .matra {
+  .matra, .ws-btn {
     background-color: aliceblue;
     color: black;
-    font-weight: 900;
+    /* font-weight: 900; */
+    margin-top: 1em;
   }
 </style>
